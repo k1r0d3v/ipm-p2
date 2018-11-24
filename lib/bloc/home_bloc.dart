@@ -1,6 +1,6 @@
 import 'bloc.dart';
 
-class TestBloc extends StatefulBloc {
+class HomeBloc extends StatefulBloc {
   @override
   Future<void> init() {
     // TODO: implement init

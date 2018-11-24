@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'bloc_provider.dart';
-import 'bloc/test_bloc.dart';
+import 'bloc/home_bloc.dart';
+
+import 'home_page.dart';
 
 
 class MyApp extends StatelessWidget {
@@ -12,9 +14,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: BlocProvider<TestBloc>(
-        bloc: TestBloc(),
-        builder: (context, snapshot) => Container(),
+      home: BlocProvider<HomeBloc>(
+        bloc: HomeBloc(),
+        builder: (context, snapshot) => HomePage(),
       ),
     );
   }
