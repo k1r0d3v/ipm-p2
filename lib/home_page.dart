@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'gallery_image_provider.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc_provider.dart';
 import 'camera.dart';
@@ -11,13 +12,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var _navSubscription;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    assert(debugCheckHasBloc<HomeBloc>(context));
+    var bloc = BlocProvider.of<HomeBloc>(context);
+
+    _navSubscription ??= bloc.gotoGalleryEventStream.listen((_) =>
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Container())));
+  }
+
+  @override
+  void dispose() {
+    _navSubscription.cancel();
+    _navSubscription = null;
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasBloc<HomeBloc>(context));
+    var bloc = BlocProvider.of<HomeBloc>(context);
 
     var o = MediaQuery.of(context).orientation;
     Widget left = GalleryButton(onTap: () {
       HapticFeedback.lightImpact();
+      bloc.gotoGalleryEventSink.add(null);
     });
 
     Widget right = Container();
@@ -32,11 +54,15 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
-      body: CameraWidget(),
+      body: CameraWidget(
+        takePictureStream: bloc.takePhotoEventStream,
+        pictureSink: bloc.photoSink,
+      ),
       actions: <Widget>[
         Expanded(child: left),
         Expanded(child: CameraButton(onTap: () {
           HapticFeedback.lightImpact();
+          bloc.takePhotoEventSink.add(null);
         })),
         Expanded(child: right),
       ],
@@ -119,8 +145,41 @@ class GalleryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var bloc = BlocProvider.of<HomeBloc>(context);
+
     return RepaintBoundary(
-      child: _circleButton(null)
+      child: StreamBuilder(
+        stream: bloc.cartoonProcessorStream,
+        builder: (context, snapshot) {
+          // Process the image on photo event
+          if (snapshot.connectionState == ConnectionState.active)
+            return FutureBuilder(
+                future: snapshot.data,
+                builder: (context, snapshot) {
+                  // Image processed, show it
+                  if (snapshot.connectionState == ConnectionState.done)
+                    return _circleButton(
+                      GalleryImageProvider(
+                          entry: bloc.lastEntry, lod: 25, cartoon: false),
+                    );
+
+                  // The image is processing
+                  return Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  );
+                });
+
+          // Load last entry if present else hide the gallery
+          return bloc.lastEntry != null
+              ? _circleButton(
+                  GalleryImageProvider(
+                      entry: bloc.lastEntry, lod: 25, cartoon: false),
+                )
+              : Container();
+        },
+      ),
     );
   }
 
