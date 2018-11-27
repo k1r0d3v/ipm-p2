@@ -54,7 +54,6 @@ class FSGalleryStorage implements GalleryStorage {
   Future<GalleryStorageEntry> store(List<int> photo, List<int> cartoon) async {
     var key = DateTime.now().toString();
 
-    // Store the reals
     var futurePhotoFile = File('${_root.path}/${key}_photo.jpg')
         .create()
         .then((file) => file.writeAsBytes(photo));
