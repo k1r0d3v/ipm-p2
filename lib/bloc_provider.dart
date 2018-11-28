@@ -76,6 +76,7 @@ class BlocProvider<T extends Bloc> extends StatelessWidget {
   final T bloc;
   final AsyncWidgetBuilder<Bloc> builder;
 
+  // TODO: Check when the BLOC is ready to use and assert if not
   static T of<T extends Bloc>(BuildContext context) =>
       _InheritedBloc.of<T>(context);
 

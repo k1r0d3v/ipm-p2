@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'gallery_image_provider.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc_provider.dart';
 import 'camera.dart';
-import 'gallery_image_provider.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
     var bloc = BlocProvider.of<HomeBloc>(context);
 
     _navSubscription ??= bloc.gotoGalleryEventStream.listen((_) =>
-        Navigator.push(context, MaterialPageRoute(builder: (context) {})));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Container())));
   }
 
   @override
@@ -34,7 +34,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasBloc<HomeBloc>(context));
-
     var bloc = BlocProvider.of<HomeBloc>(context);
 
     var o = MediaQuery.of(context).orientation;
@@ -130,8 +129,6 @@ class CameraButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //var bloc = BlocProvider.of<HomeBloc>(context);
-
     return IconButton(
       onPressed: onTap,
       icon: Icon(Icons.camera),
@@ -154,34 +151,39 @@ class GalleryButton extends StatelessWidget {
       child: StreamBuilder(
         stream: bloc.cartoonProcessorStream,
         builder: (context, snapshot) {
+          // Process the image on photo event
           if (snapshot.connectionState == ConnectionState.active)
             return FutureBuilder(
-              future: snapshot.data,
-              builder: (context, snapshot) => snapshot.connectionState ==
-                      ConnectionState.done
-                  ? _circleButton(
-                      bloc,
+                future: snapshot.data,
+                builder: (context, snapshot) {
+                  // Image processed, show it
+                  if (snapshot.connectionState == ConnectionState.done)
+                    return _circleButton(
                       GalleryImageProvider(
-                          entry: bloc.lastEntry, lod: 25, cartoon: false))
-                  : Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    ),
-            );
+                          entry: bloc.lastEntry, lod: 25, cartoon: false),
+                    );
 
+                  // The image is processing
+                  return Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  );
+                });
+
+          // Load last entry if present else hide the gallery
           return bloc.lastEntry != null
               ? _circleButton(
-                  bloc,
                   GalleryImageProvider(
-                      entry: bloc.lastEntry, lod: 25, cartoon: false))
+                      entry: bloc.lastEntry, lod: 25, cartoon: false),
+                )
               : Container();
         },
       ),
     );
   }
 
-  Widget _circleButton(HomeBloc bloc, ImageProvider provider) {
+  Widget _circleButton(ImageProvider provider) {
     return Material(
       color: Colors.transparent,
       elevation: 2.0,
@@ -190,10 +192,10 @@ class GalleryButton extends StatelessWidget {
         child: Ink(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            image: DecorationImage(
+            image: provider != null ? DecorationImage(
               image: provider,
               fit: BoxFit.cover,
-            ),
+            ) : null,
           ),
           width: 64.0,
           height: 64.0,

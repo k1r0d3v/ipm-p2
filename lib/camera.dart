@@ -54,7 +54,7 @@ class _CameraWidgetState extends State<CameraWidget> {
               builder: (context, snapshot) {
                 if (snapshot.hasData &&
                     snapshot.connectionState == ConnectionState.done)
-                  widget.pictureSink.add(snapshot.data);
+                  widget.pictureSink?.add(snapshot.data);
 
                 return _cameraPreview(context);
               },

@@ -1,11 +1,19 @@
+import 'package:ipm_p2/model/cartoon.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bloc.dart';
 
 import '../model/cartoonify_service.dart';
-import '../model/cartonify_mock_service.dart';
 import '../model/gallery_storage.dart';
+
+
+class CartoonifyMockService extends CartoonifyService {
+  @override
+  Future<Cartoon> cartoon(List<int> image) {
+    return Future.value(Cartoon.fromBytes(image));
+  }
+}
 
 
 class HomeBloc extends StatefulBloc {
@@ -25,6 +33,7 @@ class HomeBloc extends StatefulBloc {
   final GalleryStorage storage;
   GalleryStorageEntry _lastEntry;
 
+  // Last GalleryStorageEntry generated
   GalleryStorageEntry get lastEntry => _lastEntry;
 
   /// Take a photo event

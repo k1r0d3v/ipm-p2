@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'model/fs_gallery_storage.dart';
 import 'bloc_provider.dart';
 import 'bloc/home_bloc.dart';
+
 import 'home_page.dart';
+import 'model/fs_gallery_storage.dart';
 
 
 class MyApp extends StatelessWidget {
@@ -16,11 +17,9 @@ class MyApp extends StatelessWidget {
       ),
       home: BlocProvider<HomeBloc>(
         bloc: HomeBloc(FSGalleryStorage()),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done)
-            return Container();
-          return HomePage();
-        },
+        builder: (context, snapshot) => 
+          snapshot.connectionState == ConnectionState.done ?
+          HomePage() : Container()
       ),
     );
   }
