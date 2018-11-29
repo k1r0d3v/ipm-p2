@@ -5,6 +5,9 @@ import 'bloc/home_bloc.dart';
 import 'bloc_provider.dart';
 import 'camera.dart';
 
+import 'viewer_page.dart';
+import 'bloc/viewer_bloc.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,7 +24,12 @@ class _HomePageState extends State<HomePage> {
     var bloc = BlocProvider.of<HomeBloc>(context);
 
     _navSubscription ??= bloc.gotoGalleryEventStream.listen((_) =>
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Container())));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => 
+          BlocProvider<ViewerBloc>(
+            bloc: ViewerBloc([bloc.lastEntry], 0),
+            builder: (context, snapshot) => snapshot.connectionState == ConnectionState.done ? ViewerPage() : Container(),
+          )
+        )));
   }
 
   @override
