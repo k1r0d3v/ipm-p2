@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'bloc_provider.dart';
 import 'bloc/viewer_bloc.dart';
-import 'progressive_image.dart';
+import 'model/gallery_storage.dart';
 
 class ViewerPage extends StatefulWidget {
+
+  ViewerPage({this.entry, this.cartoon, this.lods});
+
+  final GalleryStorageEntry entry;
+  final List<int> lods;
+  final bool cartoon;
+
   @override
   ViewerPageState createState() => ViewerPageState();
 }
@@ -43,11 +50,10 @@ class ViewerPageState extends State<ViewerPage> {
                      scrollDirection: Axis.vertical,
                      itemCount: bloc.entries.length,
                      itemBuilder: (context, index) {
-                       return ProgressiveImage(
+                       return ViewerPage(
                          entry: bloc.entries[index],
                          cartoon: _cartoon,
-                         lods: [30,100],
-                         fit: BoxFit.cover);
+                         lods: [30,100]);
                      }
                    ),
                  ]),
