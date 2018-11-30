@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'bloc_provider.dart';
 import 'bloc/viewer_bloc.dart';
 import 'gallery_image_provider.dart';
+import 'package:share/share.dart';
 
 class ViewerPage extends StatefulWidget {
   @override
@@ -67,7 +68,9 @@ class ViewerPageState extends State<ViewerPage> {
                           ),
                           tooltip: 'Share',
                           color: Colors.white,
-                          onPressed: () {},
+                          onPressed: () {
+                            Share.share('check out my website https://example.com');
+                          },
                         ),
                       ),
                     ),
