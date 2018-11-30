@@ -10,7 +10,7 @@ class ViewerPage extends StatefulWidget {
 }
 
 class ViewerPageState extends State<ViewerPage> {
-  bool _cartoon = false;
+  bool _cartoon = true;
 
   @override
   Widget build(BuildContext context) {
