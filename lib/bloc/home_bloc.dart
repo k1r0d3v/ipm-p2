@@ -18,7 +18,7 @@ class HomeBloc extends StatefulBloc {
   var _cartoonProcessor = PublishSubject<Future<GalleryStorageEntry>>();
   var _cartoonReady = PublishSubject<GalleryStorageEntry>();
 
-  CartoonifyService _service = RemoteCartoonifyService('http://10.0.2.2:5000'); //10.0.2.2
+  CartoonifyService _service = RemoteCartoonifyService('http://192.168.1.40:5000'); //10.0.2.2
 
   final GalleryStorage storage;
   GalleryStorageEntry _lastEntry;
