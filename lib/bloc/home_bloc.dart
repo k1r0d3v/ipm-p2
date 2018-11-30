@@ -1,9 +1,7 @@
 import 'package:ipm_p2/model/cartoon.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'bloc.dart';
-
 import '../model/cartoonify_service.dart';
 import '../model/gallery_storage.dart';
 

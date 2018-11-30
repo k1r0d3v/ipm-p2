@@ -22,7 +22,7 @@ class ViewerPageState extends State<ViewerPage> {
         Positioned.fill(
           child: Image(
                 image: GalleryImageProvider(
-                  entry: bloc.entries[bloc.index],
+                  entry: bloc.entry,
                   lod: 100,
                   cartoon: _cartoon,
                 ),

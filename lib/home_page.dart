@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
     _navSubscription ??= bloc.gotoGalleryEventStream.listen((_) =>
         Navigator.push(context, MaterialPageRoute(builder: (context) => 
           BlocProvider<ViewerBloc>(
-            bloc: ViewerBloc([bloc.lastEntry], 0),
+            bloc: ViewerBloc(bloc.lastEntry),
             builder: (context, snapshot) => snapshot.connectionState == ConnectionState.done ? ViewerPage() : Container(),
           )
         )));
