@@ -3,16 +3,8 @@ import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'bloc.dart';
 import '../model/cartoonify_service.dart';
+import '../model/remote_cartoonify_service.dart';
 import '../model/gallery_storage.dart';
-
-
-class CartoonifyMockService extends CartoonifyService {
-  @override
-  Future<Cartoon> cartoon(List<int> image) {
-    return Future.value(Cartoon.fromBytes(image));
-  }
-}
-
 
 class HomeBloc extends StatefulBloc {
   SharedPreferences _preferences;
@@ -26,7 +18,7 @@ class HomeBloc extends StatefulBloc {
   var _cartoonProcessor = PublishSubject<Future<GalleryStorageEntry>>();
   var _cartoonReady = PublishSubject<GalleryStorageEntry>();
 
-  CartoonifyService _service = CartoonifyMockService();
+  CartoonifyService _service = RemoteCartoonifyService('http://10.0.2.2:5000'); //10.0.2.2
 
   final GalleryStorage storage;
   GalleryStorageEntry _lastEntry;
@@ -66,14 +58,15 @@ class HomeBloc extends StatefulBloc {
     _lastEntry = await storage.find(_getLastEntryKey());
 
     _photoEventSubscription = _photoEvent.stream.listen((photoBytes) =>
-        _cartoonProcessor.sink.add(_service
-            .cartoon(photoBytes)
-            .then((cartoon) => storage.store(photoBytes, cartoon.bytes)
-              ..then((entry) {
-                _lastEntry = entry;
-                _saveLastEntryKey();
-                _cartoonReady.sink.add(entry);
-              }))));
+        _cartoonProcessor.sink
+            .add(_service.cartoon(photoBytes).then((cartoon) => cartoon.isEmpty
+                ? Future.value(null)
+                : storage.store(photoBytes, cartoon.bytes).then((entry) {
+                    _lastEntry = entry;
+                    _saveLastEntryKey();
+                    _cartoonReady.sink.add(entry);
+                    return entry;
+                  }))));
   }
 
   @override

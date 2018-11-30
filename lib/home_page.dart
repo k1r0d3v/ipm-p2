@@ -4,10 +4,9 @@ import 'gallery_image_provider.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc_provider.dart';
 import 'camera.dart';
-
-import 'viewer_page.dart';
-import 'bloc/viewer_bloc.dart';
-
+import 'bloc/gallery_bloc.dart';
+import 'gallery_page.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -23,13 +22,17 @@ class _HomePageState extends State<HomePage> {
     assert(debugCheckHasBloc<HomeBloc>(context));
     var bloc = BlocProvider.of<HomeBloc>(context);
 
-    _navSubscription ??= bloc.gotoGalleryEventStream.listen((_) =>
-        Navigator.push(context, MaterialPageRoute(builder: (context) => 
-          BlocProvider<ViewerBloc>(
-            bloc: ViewerBloc(bloc.lastEntry),
-            builder: (context, snapshot) => snapshot.connectionState == ConnectionState.done ? ViewerPage() : Container(),
-          )
-        )));
+    _navSubscription ??=
+        bloc.gotoGalleryEventStream.listen((_) => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BlocProvider<GalleryBloc>(
+                      bloc: GalleryBloc(bloc.lastEntry, bloc.storage),
+                      builder: (context, snapshot) =>
+                          snapshot.connectionState == ConnectionState.done
+                              ? GalleryPage()
+                              : Container(),
+                    ))));
   }
 
   @override
@@ -165,11 +168,18 @@ class GalleryButton extends StatelessWidget {
                 future: snapshot.data,
                 builder: (context, snapshot) {
                   // Image processed, show it
-                  if (snapshot.connectionState == ConnectionState.done)
-                    return _circleButton(
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.data == null)
+                      Fluttertoast.showToast(
+                          msg: 'Could not convert the image, sorry',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM);
+
+                    return bloc.lastEntry != null ? _circleButton(
                       GalleryImageProvider(
                           entry: bloc.lastEntry, lod: 25, cartoon: false),
-                    );
+                    ) : Container();
+                  }
 
                   // The image is processing
                   return Center(
@@ -200,10 +210,12 @@ class GalleryButton extends StatelessWidget {
         child: Ink(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            image: provider != null ? DecorationImage(
-              image: provider,
-              fit: BoxFit.cover,
-            ) : null,
+            image: provider != null
+                ? DecorationImage(
+                    image: provider,
+                    fit: BoxFit.cover,
+                  )
+                : null,
           ),
           width: 64.0,
           height: 64.0,

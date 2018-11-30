@@ -33,4 +33,6 @@ abstract class GalleryStorage
 
   /// List this storage entries in any order.
   Stream<GalleryStorageEntry> list();
+
+  Future<void> delete(String key);
 }

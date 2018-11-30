@@ -3,7 +3,6 @@ import 'dart:io';
 import 'gallery_storage.dart';
 import 'package:path_provider/path_provider.dart';
 
-
 /// File system gallery storage entry.
 class FSGalleryStorageEntry extends GalleryStorageEntry {
   const FSGalleryStorageEntry(String key, String root)
@@ -18,7 +17,12 @@ class FSGalleryStorageEntry extends GalleryStorageEntry {
   @override
   Future<List<int>> cartoon(int lod) => _getImage('${key}_cartoon', lod);
 
-  Future<List<int>> _getImage(String key, int lod) => File('${_root}/${key}.jpg').readAsBytes();
+  Future<List<int>> _getImage(String key, int lod) async {
+      var file = File('${_root}/${key}.jpg');
+      if (await file.exists())
+        return await file.readAsBytes();
+      else return null;
+  }
 }
 
 /// File system gallery storage.
@@ -57,12 +61,24 @@ class FSGalleryStorage implements GalleryStorage {
     var futurePhotoFile = File('${_root.path}/${key}_photo.jpg')
         .create()
         .then((file) => file.writeAsBytes(photo));
-    var futureCartoonFile = File('${_root.path}/${key}_cartoon.jpg')
-        .create()
-        .then((file) => file.writeAsBytes(cartoon));
 
-    await Future.wait([futurePhotoFile, futureCartoonFile]);
+    if (cartoon != null) {
+      var futureCartoonFile = File('${_root.path}/${key}_cartoon.jpg')
+          .create()
+          .then((file) => file.writeAsBytes(cartoon));
+
+      await Future.wait([futurePhotoFile, futureCartoonFile]);
+    } else
+      await futurePhotoFile;
     return _makeEntry(key);
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    try {
+    await File('${_root.path}/${key}_photo.jpg').delete();
+    await File('${_root.path}/${key}_cartoon.jpg').delete();
+    } on Exception catch (e) { print('$e'); }
   }
 
   String _pathToKey(String path) {

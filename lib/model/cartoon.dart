@@ -7,5 +7,7 @@ class Cartoon {
 
   Cartoon.fromBytes(List<int> bytes) : this(convert.base64Encode(bytes));
 
-  List<int> get bytes => convert.base64Decode(base64);
+  List<int> get bytes => base64 != null ? convert.base64Decode(base64) : null;
+
+  bool get isEmpty => base64 == null;
 }
