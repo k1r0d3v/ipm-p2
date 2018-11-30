@@ -177,7 +177,7 @@ class GalleryButton extends StatelessWidget {
 
                     return bloc.lastEntry != null ? _circleButton(
                       GalleryImageProvider(
-                          entry: bloc.lastEntry, lod: 25, cartoon: false),
+                          entry: bloc.lastEntry, lod: 25, cartoon: true),
                     ) : Container();
                   }
 
@@ -193,7 +193,7 @@ class GalleryButton extends StatelessWidget {
           return bloc.lastEntry != null
               ? _circleButton(
                   GalleryImageProvider(
-                      entry: bloc.lastEntry, lod: 25, cartoon: false),
+                      entry: bloc.lastEntry, lod: 25, cartoon: true),
                 )
               : Container();
         },

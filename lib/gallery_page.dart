@@ -26,8 +26,7 @@ class GalleryPageState extends State<GalleryPage> {
         setState(() {
           entries = list;
           selected = <bool>[];
-          for (var i in entries)
-            selected.add(false);
+          for (var i in entries) selected.add(false);
         });
       });
     }
@@ -49,13 +48,19 @@ class GalleryPageState extends State<GalleryPage> {
                       color: Colors.white,
                     ),
                     onPressed: () {
+                      var newEntries = <GalleryStorageEntry>[];
+                      var newSelected = <bool>[];
                       for (int i = 0; i < selected.length; i++) {
-                        if (selected[i]) {
+                        if (selected[i])
                           bloc.storage.delete(entries[i].key);
-                          entries.removeAt(i);
-                          selected.removeAt(i);
+                        else {
+                          newEntries.add(entries[i]);
+                          newSelected.add(false);
                         }
                       }
+
+                      entries = newEntries;
+                      selected = newSelected;
                       setState(() {
                         selectedCount = 0;
                       });
@@ -77,7 +82,7 @@ class GalleryPageState extends State<GalleryPage> {
       padding: EdgeInsets.all(4.0),
       itemCount: entries.length,
       itemBuilder: (context, index) => Material(
-            type: MaterialType.transparency,
+            elevation: 1.0,
             child: Center(
               child: Ink(
                 decoration: BoxDecoration(
@@ -89,7 +94,7 @@ class GalleryPageState extends State<GalleryPage> {
                         image: GalleryImageProvider(
                           entry: entries[index],
                           lod: 40,
-                          cartoon: false,
+                          cartoon: true,
                         ),
                         fit: BoxFit.cover)),
                 child: InkWell(onLongPress: () {
