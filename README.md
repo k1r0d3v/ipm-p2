@@ -5,5 +5,5 @@ Se ha aplicado el patrón de diseño BLOC para el desarrollo de la aplicación.
 
 # Documentación
 
-La documentación del proyecto puede encontrarse en la carpeta **doc**. 
-En esa carpeta podemos encontrar diagramas de clase, priority guides y wireframes de la aplicación.
+La documentación del proyecto puede encontrarse en la carpeta *doc*. 
+En esa carpeta podemos encontrar diagramas de clase, *priority guides* y *wireframes* de la aplicación.
